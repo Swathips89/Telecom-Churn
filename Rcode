@@ -1,0 +1,56 @@
+# Import file using IMPORT DATASET command on top right panel #####
+Readfile <- read.csv("D:/Business data mining/Term project/Telco-Customer-Churn.csv")
+
+#Recoding the Categorical data
+Readfile$gender <- factor(Readfile$gender, levels=c("Male","Female"), labels=c(0,1))
+Readfile$Partner<- factor(Readfile$Partner, levels=c("No","Yes"), labels=c(0,1))
+Readfile$Dependents<- factor(Readfile$Dependents, levels=c("No","Yes"), labels=c(0,1))
+Readfile$PhoneService<- factor(Readfile$PhoneService, levels=c("No","Yes"), labels=c(0,1))
+Readfile$MultipleLines<- factor(Readfile$MultipleLines, levels=c("No","Yes","No phone service"), labels=c(0,1,2))
+Readfile$InternetService<- factor(Readfile$InternetService, levels=c("DSL","Fiber optic","No"), labels=c(0,1,2))
+Readfile$OnlineSecurity<- factor(Readfile$OnlineSecurity, levels=c("No","Yes","No internet service"), labels=c(0,1,2))
+Readfile$OnlineBackup<- factor(Readfile$OnlineBackup, levels=c("No","Yes","No internet service"), labels=c(0,1,2))
+Readfile$DeviceProtection<- factor(Readfile$DeviceProtection, levels=c("No","Yes","No internet service"), labels=c(0,1,2))
+Readfile$TechSupport<- factor(Readfile$TechSupport, levels=c("No","Yes","No internet service"), labels=c(0,1,2))
+Readfile$StreamingTV<- factor(Readfile$StreamingTV, levels=c("No","Yes","No internet service"), labels=c(0,1,2))
+Readfile$StreamingMovies<- factor(Readfile$StreamingMovies, levels=c("No","Yes","No internet service"), labels=c(0,1,2))
+Readfile$Contract<- factor(Readfile$Contract, levels=c("Month-to-month","One year","Two year"), labels=c(0,1,2))
+Readfile$PaperlessBilling<- factor(Readfile$PaperlessBilling, levels=c("No","Yes"), labels=c(0,1))
+Readfile$PaymentMethod<- factor(Readfile$PaymentMethod, levels=c("Electronic check","Mailed check","Bank transfer (automatic)","Credit card (automatic)"), labels=c(0,1,2,4))
+Readfile$Churn<- factor(Readfile$Churn, levels=c("No","Yes"), labels=c(0,1))
+
+##Applying the categorical variables covereted data into Final_data data frame
+Convert_data <- Readfile
+
+# Removing the Customer ID field #####
+Final_data <-  Convert_data[,-1] 
+
+# Summary of the file #####
+summary(Final_data)
+
+# to find data types of all columns in the data frame
+sapply(Final_data, class)
+
+# to find the missing values in the data frame
+
+apply(is.na(Final_data), 2, which)
+
+# Impute missing data
+Final_data$TotalCharges[is.na(Final_data$TotalCharges)] <- 0
+
+#check if imputation has been applied successfully
+apply(is.na(Final_data), 2, which)
+
+## 75% of the sample size
+smp_size <- floor(0.75 * nrow(Final_data))
+
+## set the seed to make your partition reproducible
+set.seed(123)
+train_ind <- sample(seq_len(nrow(Final_data)), size = smp_size)
+
+train <- Final_data[train_ind, ]
+test <- Final_data[-train_ind, ]
+
+# REGRESSION on train data #######################
+m1=glm(Churn~.,data=train,family = "binomial")
+summary(m1)
