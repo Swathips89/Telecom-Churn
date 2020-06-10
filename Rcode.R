@@ -1,4 +1,5 @@
 
+##Author -- Swathi PS
 install.packages("car")
 library(car)
 #AIC calculation for variable selection
